@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: stg_vessels
+    description: "Cleaned staging layer for vessel raw data"
+
+    columns:
+      - name: entity_name
+        tests:
+          - not_null
+
+      - name: source_url
+        tests:
+          - not_null

@@ -1,0 +1,34 @@
+version: 2
+
+models:
+  - name: dim_vessels
+    description: "Dimension table containing unique vessels"
+
+    columns:
+      - name: vessel_id
+        description: "Surrogate key for vessels"
+        tests:
+          - unique
+          - not_null
+
+      - name: entity_name
+        description: "Name of the vessel"
+        tests:
+          - not_null
+
+  - name: fct_vessel_metrics
+    description: "Fact table storing vessel observation metrics"
+
+    columns:
+      - name: vessel_id
+        description: "Foreign key linking to dim_vessels"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_vessels')
+              field: vessel_id
+
+      - name: scraped_at
+        description: "Timestamp when vessel data was scraped"
+        tests:
+          - not_null

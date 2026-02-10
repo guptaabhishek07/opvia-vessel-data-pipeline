@@ -1,0 +1,174 @@
+# Analysis Answers
+
+## B1 — Dashboard Design
+
+**Dashboard Title:**
+Global Vessel Fleet Monitoring Dashboard
+
+**Target Stakeholder Persona:**
+Operations Manager / Logistics Planning Manager
+
+**Top 6 KPIs**
+
+1. Total vessels tracked
+2. Vessel category distribution
+3. Daily ingestion record count
+4. Newly observed vessels (daily)
+5. Average vessel size (derived from dimensions)
+6. Top vessel categories by frequency
+
+**Top 6 Visuals**
+
+1. Vessel type distribution bar chart
+2. Daily ingestion trend line chart
+3. Top 10 vessel types chart
+4. Observation frequency heatmap
+5. Vessel size distribution histogram
+6. Recently observed vessels table
+
+**Filters / Slicers**
+
+* Vessel type
+* Scrape date range
+* Vessel size range
+* Source URL
+
+**Dashboard Pages**
+Two pages recommended:
+
+* Executive Overview (KPIs + trends)
+* Operational Deep Dive (distribution, recent activity)
+
+This separation supports both leadership insights and operational monitoring.
+
+---
+
+## B2 — Stakeholder Insights
+
+### Obvious Insights
+
+1. Total vessels observed in dataset
+2. Most common vessel categories
+3. Daily ingestion trend
+4. Recently added vessel observations
+5. Category-wise distribution of fleet
+
+### Non-Obvious Insights
+
+1. Detection of unusually large vessels (outlier detection)
+2. Sudden spikes in specific vessel categories
+3. Ingestion stability monitoring using record count anomalies
+4. Vessel observation frequency clustering
+5. Trend shifts in vessel category composition over time
+
+---
+
+## B3 — Data Quality & Reliability Plan
+
+**Top 5 Data Quality Checks**
+
+1. Row count validation per ingestion batch
+2. Null checks for entity_name and type
+3. Duplicate detection using entity_name + scrape timestamp
+4. Format validation for vessel dimension fields
+5. Schema drift monitoring
+
+**Detecting Website Layout Changes**
+
+* Monitor sudden drop in scraped row counts
+* Implement HTML structure validation tests
+* Alert pipeline when selector parsing fails
+
+**Versioning Historical Data**
+
+* Store raw ingestion snapshots by scrape date
+* Partition fact tables by ingestion timestamp
+
+**Handling Duplicates**
+
+* Deduplicate in staging layer using entity_name + scraped_at
+* Maintain surrogate keys in dimension tables
+
+---
+
+## B4 — LLM Integration Use Cases
+
+### Use Case 1 — Natural Language Fleet Insights
+
+**Prompt:**
+“Summarize vessel category trends over the last week.”
+
+**Data Retrieved:**
+Aggregated category counts by scrape date
+
+**LLM Output:**
+Plain-language summary highlighting trend increases/decreases
+
+**Risks:**
+Hallucinated insights, incorrect aggregations
+
+**Mitigation:**
+Provide structured query outputs to LLM as grounding context
+
+---
+
+### Use Case 2 — Automated Anomaly Explanation
+
+**Prompt:**
+“Explain why vessel observations spiked today.”
+
+**Data Retrieved:**
+Daily ingestion metrics and category distribution
+
+**LLM Output:**
+Contextual explanation of ingestion spike causes
+
+**Risks:**
+Misinterpretation of anomalies
+
+**Mitigation:**
+Rule-based anomaly detection before LLM explanation
+
+---
+
+## B5 — n8n Workflow Automation Design
+
+**Trigger Condition:**
+Weekly scheduled execution
+
+**Workflow Steps**
+
+1. Scrape vessel data
+2. Load CSV into Snowflake stage
+3. Run ingestion SQL
+4. Execute dbt transformations
+5. Generate weekly analytics summary
+
+**Alert Logic**
+
+* Notify if ingestion row count deviates >20% from weekly average
+
+**Output Destination**
+Slack / Email weekly operations summary
+
+**Failure Handling**
+
+* Retry scraping up to 3 times
+* Send failure alert if retries exhausted
+
+**Avoiding False Positives**
+
+* Use rolling 4-week average comparison
+* Ignore small fluctuations (<5%)
+
+**Key Business Event to Monitor**
+Sudden surge or drop in vessel observation volume indicating operational changes or scraping failures
+
+---
+
+## B6 — Client Memo (CFO / COO)
+
+An automated vessel intelligence pipeline was developed to extract public maritime vessel data, load it into Snowflake, and transform it into analytics-ready warehouse models using dbt. The system enables consistent fleet monitoring, category trend analysis, and operational reporting without manual data collection.
+
+This pipeline reduces manual reporting effort, improves visibility into fleet composition, and enables scalable analytics workflows. The recommended next phase is to automate scheduled ingestion, integrate BI dashboards, and implement data quality monitoring to support real-time operational decision-making.
+
